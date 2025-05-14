@@ -28,8 +28,24 @@
 #include "wlr-screencopy-unstable-v1-client-protocol.h"
 #include "wlr-layer-shell-unstable-v1-client-protocol.h"
 
-static void noop() {
-  // This space is intentionally left blank
+static void noop_finished(void *data, struct zwlr_output_manager_v1 *output_manager) {
+    // Corpo vazio
+}
+
+static void noop_global_remove(void *data, struct wl_registry *registry, uint32_t id) {
+    // Corpo vazio
+}
+
+static void noop_logical_size(void *data, struct zxdg_output_v1 *output, int32_t width, int32_t height) {
+    // Corpo vazio
+}
+
+static void noop_done(void *data, struct zxdg_output_v1 *output) {
+    // Corpo vazio
+}
+
+static void noop_description(void *data, struct zxdg_output_v1 *output, const char *description) {
+    // Corpo vazio
 }
 
 struct wd_pending_config {
@@ -166,9 +182,8 @@ static int create_shm_file(size_t size, const char *fmt, ...) {
   int result = vasprintf(&shm_name, fmt, vl);
   va_end(vl);
 
-  if (result == -1) {
+  if (result == -1 || shm_name == NULL) {
     fprintf(stderr, "asprintf: %s\n", strerror(errno));
-    shm_name = NULL;
     return -1;
   }
 
@@ -178,6 +193,7 @@ static int create_shm_file(size_t size, const char *fmt, ...) {
     free(shm_name);
     return -1;
   }
+
   shm_unlink(shm_name);
   free(shm_name);
 
@@ -186,6 +202,7 @@ static int create_shm_file(size_t size, const char *fmt, ...) {
     close(fd);
     return -1;
   }
+
   return fd;
 }
 
@@ -526,7 +543,7 @@ static void output_manager_handle_done(void *data,
 static const struct zwlr_output_manager_v1_listener output_manager_listener = {
   .head = output_manager_handle_head,
   .done = output_manager_handle_done,
-  .finished = noop,
+  .finished = noop_finished,
 };
 static void registry_handle_global(void *data, struct wl_registry *registry,
     uint32_t name, const char *interface, uint32_t version) {
@@ -553,7 +570,7 @@ static void registry_handle_global(void *data, struct wl_registry *registry,
 
 static const struct wl_registry_listener registry_listener = {
   .global = registry_handle_global,
-  .global_remove = noop,
+  .global_remove = noop_global_remove,
 };
 
 void wd_add_output_management_listener(struct wd_state *state, struct
@@ -603,10 +620,10 @@ static void output_name(void *data, struct zxdg_output_v1 *zxdg_output_v1,
 
 static const struct zxdg_output_v1_listener output_listener = {
   .logical_position = output_logical_position,
-  .logical_size = noop,
-  .done = noop,
+  .logical_size = noop_logical_size,
+  .done = noop_done,
   .name = output_name,
-  .description = noop
+  .description = noop_description
 };
 
 void wd_add_output(struct wd_state *state, struct wl_output *wl_output,
