@@ -25,6 +25,8 @@ Check your distro for a `wdisplays` package. Known distro packages:
 - [Nix](https://github.com/NixOS/nixpkgs/tree/master/pkgs/tools/graphics/wdisplays)
 - [OpenSUSE](https://build.opensuse.org/package/show/home%3AMWh3/wdisplays)
 
+Note: Currently, to use this project, you will need to build it from source, as it is a fork of the original repository with some tested fixes. These fixes are currently working well on Arch Linux, and further improvements for other distros will be made over time.
+
 # Building
 
 Build requirements are:
